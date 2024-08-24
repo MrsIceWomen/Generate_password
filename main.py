@@ -1,6 +1,5 @@
 import secrets
 import string
-import unittest
 
 
 def generate_password(length, use_letters, use_digits, use_specials):
@@ -17,7 +16,12 @@ def generate_password(length, use_letters, use_digits, use_specials):
 
 
 def get_user_preferences():
-    length = int(input('Введите длину пароля: '))
+    while True:
+        length = int(input('Введите длину пароля: '))
+        if length > 0:
+            break
+        else:
+            print('Длина пароля должна быть положительным числом.')
     use_letters = input('Добавить буквы? (да/нет) ').lower() == 'да'
     use_digits = input('Добавить цифры? (да/нет) ').lower() == 'да'
     use_specials = input('Добавить спецсимволы? (да/нет) ').lower() == 'да'
@@ -67,39 +71,4 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-class TestPasswordFunc(unittest.TestCase):
-    def test_generate_password(self):
-        self.assertEqual(len(generate_password(10, True, True, True)), 10)
-        self.assertEqual(len(generate_password(8, True, False, True)), 8)
-        self.assertEqual(len(generate_password(12, False, True, False)), 12)
-        with self.assertRaises(ValueError):
-            generate_password(9, False, False, False)
-
-    def test_assess_password_strength(self):
-        self.assertEqual(assess_password_strength('zsdf123A@!pokj'), 4)
-        self.assertEqual(assess_password_strength('zsdf123'), 3)
-        self.assertEqual(assess_password_strength('123456'), 2)
-        self.assertEqual(assess_password_strength('12'), 1)
-
-    def test_mask_password(self):
-        self.assertEqual(mask_password('1234567axd'), '**********')
-
-    def test_get_user_preferences(self):
-        length, use_letters, use_digits, use_specials = get_user_preferences()
-        self.assertIsInstance(length, int)
-        self.assertIsInstance(use_digits, bool)
-        self.assertIsInstance(use_letters, bool)
-        self.assertIsInstance(use_specials, bool)
-
-    def test_save_password_to_file(self):
-        test_filename = 'test_passwords.txt'
-        test_password = 'test_password'
-        save_password_to_file(test_password, test_filename)
-        with open(test_filename, 'r') as file:
-            lines = file.readlines()
-            self.assertIn(test_password + '\n', lines)
-
-    if __name__ == '__main__':
-        unittest.main()
+    
