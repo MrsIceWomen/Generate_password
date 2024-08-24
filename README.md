@@ -17,12 +17,10 @@
 ```python
 import secrets
 import string
-import unittest
 ```
 
 - **`secrets`**: Обеспечивает функции для генерации криптографически безопасныхг случайных чисел.
 - **`string`**: Содержит строковые константы, такие как ascii_letters, digits, и punctuation.
-- **`unittest`**: Используется для создания и запуска тестов.
 
 ### Функции:
 
@@ -50,7 +48,12 @@ def generate_password(length, use_letters, use_digits, use_specials):
 
 ```python
 def get_user_preferences():
-    length = int(input('Введите длину пароля: '))
+    while True:
+        length = int(input('Введите длину пароля: '))
+        if length > 0:
+            break
+        else:
+            print('Длина пароля должна быть положительным числом.')
     use_letters = input('Добавить буквы? (да/нет) ').lower() == 'да'
     use_digits = input('Добавить цифры? (да/нет) ').lower() == 'да'
     use_specials = input('Добавить спецсимволы? (да/нет) ').lower() == 'да'
@@ -135,6 +138,11 @@ if __name__ == '__main__':
 ### Юнит-тесты
 
 ```python
+import unittest
+from unittest.mock import patch
+from main import generate_password, get_user_preferences, save_password_to_file, assess_password_strength, mask_password
+
+
 class TestPasswordFunc(unittest.TestCase):
     def test_generate_password(self):
         self.assertEqual(len(generate_password(10, True, True, True)), 10)
@@ -152,13 +160,6 @@ class TestPasswordFunc(unittest.TestCase):
     def test_mask_password(self):
         self.assertEqual(mask_password('1234567axd'), '**********')
 
-    def test_get_user_preferences(self):
-        length, use_letters, use_digits, use_specials = get_user_preferences()
-        self.assertIsInstance(length, int)
-        self.assertIsInstance(use_digits, bool)
-        self.assertIsInstance(use_letters, bool)
-        self.assertIsInstance(use_specials, bool)
-
     def test_save_password_to_file(self):
         test_filename = 'test_passwords.txt'
         test_password = 'test_password'
@@ -166,6 +167,15 @@ class TestPasswordFunc(unittest.TestCase):
         with open(test_filename, 'r') as file:
             lines = file.readlines()
             self.assertIn(test_password + '\n', lines)
+
+    @patch('using_input', return_value=True)
+    def test_get_user_preferences(self, mock_input):
+        length, use_letters, use_digits, use_specials = get_user_preferences()
+        use_digits, use_specials, use_letters = mock_input()
+        self.assertIsInstance(length, int)
+        self.assertIsInstance(use_digits, bool)
+        self.assertIsInstance(use_letters, bool)
+        self.assertIsInstance(use_specials, bool)
 
     if __name__ == '__main__':
         unittest.main()
@@ -176,8 +186,8 @@ class TestPasswordFunc(unittest.TestCase):
   - Генерация пароля с проверкой длины и обработки ошибок.
   - Оценка сложности пароля.
   - Маскирование пароля.
-  - Поверка правильности выбора предпочтений пользователя.
   - Сохранение в файл и очистка. 
+  - Поверка правильности выбора предпочтений пользователя.
 
 Этот документ предоставляет полное руководство по пониманию и использованию программы генератора паролей.
 
